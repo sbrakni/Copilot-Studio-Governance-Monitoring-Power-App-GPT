@@ -1,0 +1,17 @@
+{
+  "name": "GOV - Alert Notification Dispatcher",
+  "type": "Automated",
+  "trigger": "Dataverse.WhenRowAdded",
+  "triggerConfig": {"table":"gov_alertlog"},
+  "workflowDefinition": {
+    "actions": {
+      "Build_AdaptiveCard": "Compose JSON card with title, message, agent, env, deep link",
+      "Switch_Severity": {
+        "Critical": ["Post Teams adaptive card", "Send Outlook email to gov_AdminEmailGroup"],
+        "High": ["Post Teams adaptive card"],
+        "Medium": ["No push"],
+        "Low": ["No push"]
+      }
+    }
+  }
+}

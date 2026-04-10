@@ -1,0 +1,19 @@
+{
+  "forms": [
+    {"table":"gov_agentinventory","mainForm":"GOV Agent Inventory Main","tabs":["Overview","Features","Compliance","Telemetry"]},
+    {"table":"gov_creditconsumption","mainForm":"GOV Credit Consumption Main","tabs":["General","Feature Breakdown"]},
+    {"table":"gov_environmentcapacity","mainForm":"GOV Environment Capacity Main","tabs":["Capacity","Governance"]},
+    {"table":"gov_compliancerule","mainForm":"GOV Compliance Rule Main","tabs":["Definition","Automation"]},
+    {"table":"gov_complianceviolation","mainForm":"GOV Compliance Violation Main","tabs":["Incident","Resolution"]},
+    {"table":"gov_alertlog","mainForm":"GOV Alert Main","tabs":["Alert","Context"]},
+    {"table":"gov_tenantsummary","mainForm":"GOV Tenant Summary Main","tabs":["KPIs"]}
+  ],
+  "views": [
+    {"table":"gov_agentinventory","name":"Active Agents","columns":["gov_name","gov_environmentname","gov_orchestrationtype","gov_compliancestatus","gov_agentstatus","gov_lastsynced"]},
+    {"table":"gov_agentinventory","name":"Non-Compliant Agents","filter":"gov_compliancestatus ne 'Compliant'"},
+    {"table":"gov_environmentcapacity","name":"Capacity Watchlist","filter":"gov_capacitystatus ne 'Within Capacity'"},
+    {"table":"gov_complianceviolation","name":"Open Violations","filter":"gov_status eq 'Open'"},
+    {"table":"gov_alertlog","name":"Unread Alerts","filter":"gov_isread eq false"},
+    {"table":"gov_creditconsumption","name":"Daily Consumption","sort":"gov_date desc"}
+  ]
+}

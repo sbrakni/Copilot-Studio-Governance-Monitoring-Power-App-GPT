@@ -1,0 +1,18 @@
+{
+  "name": "GOV - On-Demand Agent Deep Scan",
+  "type": "Instant",
+  "trigger": "PowerAppsV2",
+  "inputs": ["AgentID", "EnvironmentID"],
+  "workflowDefinition": {
+    "actions": {
+      "Query_Bot": "Dataverse bot row by botid",
+      "Query_BotComponents": "botcomponent + botcomponentcollection by botid",
+      "Extract_Topics_KS_Connectors": "Parse JSON blobs for trigger phrases, knowledge sources, auth modes",
+      "Query_Flows": "process table + clientdata.connectionreferences",
+      "Query_Conversation_Transcripts_30d": "conversationtranscript filtered last 30 days",
+      "Upsert_Enriched_Agent": "Update gov_agentinventory with derived fields",
+      "Run_Compliance_For_Agent": "Invoke GOV - Compliance Evaluator with optionalAgentId",
+      "Respond_To_App": "Return summary payload and refreshed compliance status"
+    }
+  }
+}

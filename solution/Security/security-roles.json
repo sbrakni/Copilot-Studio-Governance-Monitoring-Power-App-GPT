@@ -1,0 +1,42 @@
+{
+  "roles": [
+    {
+      "name": "GOV - Governance Admin",
+      "schemaName": "gov_GovernanceAdmin",
+      "privileges": {
+        "tables": {
+          "gov_agentinventory": "CreateReadWriteDeleteAppendAppendToAssignShare",
+          "gov_creditconsumption": "CreateReadWriteDeleteAppendAppendToAssignShare",
+          "gov_environmentcapacity": "CreateReadWriteDeleteAppendAppendToAssignShare",
+          "gov_compliancerule": "CreateReadWriteDeleteAppendAppendToAssignShare",
+          "gov_complianceviolation": "CreateReadWriteDeleteAppendAppendToAssignShare",
+          "gov_alertlog": "CreateReadWriteDeleteAppendAppendToAssignShare",
+          "gov_tenantsummary": "CreateReadWriteDeleteAppendAppendToAssignShare"
+        },
+        "cloudFlows": "RunAll",
+        "canvasApp": "Use+Share",
+        "exportData": true,
+        "settingsAccess": true
+      }
+    },
+    {
+      "name": "GOV - Governance Viewer",
+      "schemaName": "gov_GovernanceViewer",
+      "privileges": {
+        "tables": {
+          "gov_agentinventory": "Read",
+          "gov_creditconsumption": "Read",
+          "gov_environmentcapacity": "Read",
+          "gov_compliancerule": "Read",
+          "gov_complianceviolation": "Read",
+          "gov_alertlog": "Read",
+          "gov_tenantsummary": "Read"
+        },
+        "cloudFlows": "None",
+        "canvasApp": "Use",
+        "exportData": true,
+        "settingsAccess": false
+      }
+    }
+  ]
+}

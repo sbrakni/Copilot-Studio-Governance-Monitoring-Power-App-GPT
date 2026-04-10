@@ -1,0 +1,33 @@
+{
+  "name": "GOV - Daily Credit Consumption Sync",
+  "type": "Scheduled",
+  "recurrence": {"frequency":"Day","interval":1,"startTimeUtc":"06:00"},
+  "workflowDefinition": {
+    "actions": {
+      "Call_PPAC_Licensing_API": {
+        "type":"Http",
+        "method":"GET",
+        "uri":"https://api.powerplatform.com/licensing/billingPolicies/@{variables('policyId')}/reports/copilotStudioCredits"
+      },
+      "If_API_Authorized": {
+        "condition":"@equals(outputs('Call_PPAC_Licensing_API')?['statusCode'],200)",
+        "actions": {
+          "Parse_Usage": "Parse JSON and upsert gov_creditconsumption",
+          "Update_Env_MTD": "Aggregate usage by environment into gov_environmentcapacity"
+        },
+        "else": {
+          "Create_DataSyncFailure_Alert": {
+            "table":"gov_alertlog",
+            "row": {
+              "gov_alerttype":"DataSyncFailure",
+              "gov_severity":"High",
+              "gov_title":"Automated credit sync unavailable",
+              "gov_message":"PPAC API returned 401/403. Upload CSV to SharePoint folder for manual ingestion."
+            }
+          }
+        }
+      },
+      "Evaluate_Overage_And_HighConsumption": "Create Overage/HighConsumption alerts from gov_environmentcapacity and gov_creditconsumption"
+    }
+  }
+}
