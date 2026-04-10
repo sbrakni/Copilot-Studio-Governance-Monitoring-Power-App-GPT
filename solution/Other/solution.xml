@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ImportExportXml version="9.2.0.0" SolutionPackageVersion="9.2" languagecode="1033" generatedBy="GPT-5.3-Codex">
+  <SolutionManifest>
+    <UniqueName>CopilotStudioGovernance</UniqueName>
+    <LocalizedNames>
+      <LocalizedName description="Copilot Studio Governance" languagecode="1033" />
+    </LocalizedNames>
+    <Descriptions>
+      <Description description="Copilot Studio Governance &amp; Monitoring unmanaged solution" languagecode="1033" />
+    </Descriptions>
+    <Version>1.0.0.0</Version>
+    <Managed>0</Managed>
+    <Publisher>
+      <UniqueName>gov</UniqueName>
+      <LocalizedNames>
+        <LocalizedName description="Governance Publisher" languagecode="1033" />
+      </LocalizedNames>
+      <Descriptions>
+        <Description description="Publisher for Copilot governance assets" languagecode="1033" />
+      </Descriptions>
+      <CustomizationPrefix>gov</CustomizationPrefix>
+      <CustomizationOptionValuePrefix>29500</CustomizationOptionValuePrefix>
+    </Publisher>
+    <RootComponents>
+      <RootComponent type="1" schemaName="gov_AgentInventory" behavior="0" />
+      <RootComponent type="1" schemaName="gov_CreditConsumption" behavior="0" />
+      <RootComponent type="1" schemaName="gov_EnvironmentCapacity" behavior="0" />
+      <RootComponent type="1" schemaName="gov_ComplianceRule" behavior="0" />
+      <RootComponent type="1" schemaName="gov_ComplianceViolation" behavior="0" />
+      <RootComponent type="1" schemaName="gov_AlertLog" behavior="0" />
+      <RootComponent type="1" schemaName="gov_TenantSummary" behavior="0" />
+      <RootComponent type="29" schemaName="GOV_MainDashboard" behavior="0" />
+      <RootComponent type="380" schemaName="GOV - Daily Agent Inventory Sync" behavior="0" />
+      <RootComponent type="380" schemaName="GOV - Daily Credit Consumption Sync" behavior="0" />
+      <RootComponent type="380" schemaName="GOV - Manual Credit Report Import" behavior="0" />
+      <RootComponent type="380" schemaName="GOV - Compliance Evaluator" behavior="0" />
+      <RootComponent type="380" schemaName="GOV - Alert Notification Dispatcher" behavior="0" />
+      <RootComponent type="380" schemaName="GOV - Weekly Governance Report" behavior="0" />
+      <RootComponent type="380" schemaName="GOV - On-Demand Agent Deep Scan" behavior="0" />
+      <RootComponent type="20" schemaName="gov_GovernanceAdmin" behavior="0" />
+      <RootComponent type="20" schemaName="gov_GovernanceViewer" behavior="0" />
+    </RootComponents>
+  </SolutionManifest>
+</ImportExportXml>

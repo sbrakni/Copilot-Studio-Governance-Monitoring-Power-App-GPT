@@ -1,0 +1,14 @@
+{
+  "name": "GOV - Weekly Governance Report",
+  "type": "Scheduled",
+  "recurrence": {"frequency":"Week","interval":1,"startTimeUtc":"Monday 08:00"},
+  "workflowDefinition": {
+    "actions": {
+      "Query_Last7_TenantSummary": "gov_tenantsummary date ge utcNow()-7d",
+      "Query_Open_Violations": "gov_complianceviolation status eq Open",
+      "Aggregate_Weekly_Consumption": "group by agent/environment from gov_creditconsumption",
+      "Render_HTML_Report": "Include totals, violations, top 10 agents, >80% environments, WoW trend",
+      "Send_Email": "Send to gov_AdminEmailGroup"
+    }
+  }
+}

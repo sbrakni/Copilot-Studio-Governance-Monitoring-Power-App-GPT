@@ -1,0 +1,21 @@
+{
+  "name": "GOV - Compliance Evaluator",
+  "type": "ChildFlow",
+  "inputs": ["optionalAgentId", "optionalEnvironmentId"],
+  "workflowDefinition": {
+    "actions": {
+      "List_Active_Rules": "List gov_compliancerule where gov_isactive eq true",
+      "List_Agents": "List gov_agentinventory or single filtered agent",
+      "ForEach_Agent": {
+        "ForEach_Rule": {
+          "Evaluate_Dynamic_Logic": "@json(items('ForEach_Rule')?['gov_evaluationlogic'])",
+          "SupportedOperators": ["equals", "notEquals", "contains", "gt", "lt", "isBlank", "in"],
+          "If_Violation": "Create or update gov_complianceviolation with status Open"
+        },
+        "Set_Compliance_Status": "Worst open severity => Non-Compliant|Warning|Compliant",
+        "Optional_AutoRemediation": "Disable agent if critical + rule gov_autoremediation true"
+      },
+      "Create_Critical_Alerts": "For newly created critical open violations insert gov_alertlog"
+    }
+  }
+}

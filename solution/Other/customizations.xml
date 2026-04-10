@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ImportExportXml version="9.2.0.0" languagecode="1033" generatedBy="GPT-5.3-Codex">
+  <Entities>
+    <Entity>gov_AgentInventory</Entity>
+    <Entity>gov_CreditConsumption</Entity>
+    <Entity>gov_EnvironmentCapacity</Entity>
+    <Entity>gov_ComplianceRule</Entity>
+    <Entity>gov_ComplianceViolation</Entity>
+    <Entity>gov_AlertLog</Entity>
+    <Entity>gov_TenantSummary</Entity>
+  </Entities>
+  <Roles>
+    <Role>gov_GovernanceAdmin</Role>
+    <Role>gov_GovernanceViewer</Role>
+  </Roles>
+  <Workflows>
+    <Workflow>GOV - Daily Agent Inventory Sync</Workflow>
+    <Workflow>GOV - Daily Credit Consumption Sync</Workflow>
+    <Workflow>GOV - Manual Credit Report Import</Workflow>
+    <Workflow>GOV - Compliance Evaluator</Workflow>
+    <Workflow>GOV - Alert Notification Dispatcher</Workflow>
+    <Workflow>GOV - Weekly Governance Report</Workflow>
+    <Workflow>GOV - On-Demand Agent Deep Scan</Workflow>
+  </Workflows>
+  <CanvasApps>
+    <CanvasApp>GOV_MainDashboard</CanvasApp>
+  </CanvasApps>
+</ImportExportXml>

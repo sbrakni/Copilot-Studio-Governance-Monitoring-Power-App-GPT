@@ -1,0 +1,93 @@
+App:
+  Name: GOV_MainDashboard
+  Theme:
+    SidebarColor: "#0B1F3A"
+    ContentBackground: "#FFFFFF"
+    Accent: "#0F6CBD"
+    Critical: "#C50F1F"
+    Warning: "#F59E0B"
+    Success: "#107C10"
+  OnStart: |
+    Set(varIsAdmin, !IsBlank(LookUp('Security Roles', Name = "GOV - Governance Admin")));
+    Set(varNowUtc, DateAdd(Now(), -TimeZoneOffset(), TimeUnit.Minutes));
+    Concurrent(
+      ClearCollect(colTenantSummary30, FirstN(SortByColumns(gov_TenantSummary, "gov_date", SortOrder.Descending), 30)),
+      ClearCollect(colTenantSummary90, FirstN(SortByColumns(gov_TenantSummary, "gov_date", SortOrder.Descending), 90)),
+      ClearCollect(colEnvCap, gov_EnvironmentCapacity),
+      ClearCollect(colRules, Filter(gov_ComplianceRule, gov_isactive = true)),
+      ClearCollect(colUnreadAlerts, Filter(gov_AlertLog, gov_isread = false))
+    );
+    Set(varLatestSummary, First(SortByColumns(gov_TenantSummary, "gov_date", SortOrder.Descending)));
+  Formulas:
+    fnComplianceColor: "If(ThisItem.gov_compliancestatus='Compliant',ColorValue('#107C10'),ThisItem.gov_compliancestatus='Warning',ColorValue('#F59E0B'),ColorValue('#C50F1F'))"
+    fnCapacityPct: "If(ThisItem.gov_allocatedcredits=0,0,ThisItem.gov_consumedcreditsmtd/ThisItem.gov_allocatedcredits)"
+
+Screens:
+  - Name: scrHome
+    OnVisible: |
+      Concurrent(
+        ClearCollect(colRecentAlerts, FirstN(SortByColumns(gov_AlertLog, "createdon", SortOrder.Descending), 10)),
+        ClearCollect(colTopAgentsMTD, FirstN(SortByColumns(AddColumns(GroupBy(Filter(gov_CreditConsumption, Month(gov_date)=Month(Today()) && Year(gov_date)=Year(Today())), gov_agentid, rows), totalCredits, Sum(rows, gov_billedcredits)), "totalCredits", SortOrder.Descending),5))
+      )
+    Controls:
+      - KPI_TotalAgents: "Text(varLatestSummary.gov_totalagents)"
+      - KPI_ComplianceScore_Color: "If(varLatestSummary.gov_compliancescore>=90,Color.Green,If(varLatestSummary.gov_compliancescore>=70,Color.Orange,Color.Red))"
+      - Gallery_RecentAlerts_Items: "colRecentAlerts"
+
+  - Name: scrAgentInventory
+    Controls:
+      - txtSearchAgent_Default: ""
+      - ddEnvironment_Items: "Sort(Distinct(gov_AgentInventory, gov_environmentname), Value)"
+      - tglOrchestration_Items: "[\"All\",\"Generative\",\"Classic\"]"
+      - galAgents_Items: |
+          SortByColumns(
+            Filter(
+              gov_AgentInventory,
+              IsBlank(txtSearchAgent.Text) || StartsWith(gov_name, txtSearchAgent.Text) || StartsWith(gov_description, txtSearchAgent.Text) || StartsWith(gov_agentcreatedby, txtSearchAgent.Text),
+              IsBlank(ddEnvironment.Selected.Value) || gov_environmentname = ddEnvironment.Selected.Value,
+              tglOrchestration.Selected.Value = "All" || gov_orchestrationtype = tglOrchestration.Selected.Value,
+              ddCompliance.Selected.Value = "All" || gov_compliancestatus = ddCompliance.Selected.Value,
+              ddAuth.Selected.Value = "All" || gov_enduserauthtype = ddAuth.Selected.Value,
+              ddStatus.Selected.Value = "All" || gov_agentstatus = ddStatus.Selected.Value
+            ),
+            varSortColumn,
+            varSortDirection
+          )
+
+  - Name: scrAgentDetail
+    Params: ["prmAgentRecord"]
+    Controls:
+      - btnDeepScan_OnSelect: "Set(varDeepScanResult, 'GOV - On-Demand Agent Deep Scan'.Run(prmAgentRecord.gov_agentid, prmAgentRecord.gov_environmentid)); Refresh(gov_AgentInventory)"
+      - btnOpenStudio_OnSelect: "Launch($\"https://copilotstudio.microsoft.com/environments/{prmAgentRecord.gov_environmentid}/bots/{prmAgentRecord.gov_agentid}/overview\")"
+      - tabCompliance_Items: "Filter(gov_ComplianceViolation, gov_agentid.gov_agentinventoryid = prmAgentRecord.gov_agentinventoryid)"
+
+  - Name: scrEnvironmentOverview
+    Controls:
+      - galEnvironment_Items: "SortByColumns(gov_EnvironmentCapacity, \"gov_environmentname\", SortOrder.Ascending)"
+      - lblGaugeColor_Text: "If(fnCapacityPct>1,\"Red\",If(fnCapacityPct>0.8,\"Orange\",\"Green\"))"
+
+  - Name: scrCredits
+    Controls:
+      - dateFrom_Default: "DateAdd(Today(), -30, TimeUnit.Days)"
+      - chartTenant_Items: "Filter(gov_CreditConsumption, gov_date >= dateFrom.SelectedDate && gov_date <= dateTo.SelectedDate)"
+      - lblProjection_Text: "With({days: Day(Today()), mtd: Sum(Filter(gov_CreditConsumption, Month(gov_date)=Month(Today())), gov_billedcredits)}, Round((mtd/days)*Day(DateAdd(Date(Year(Today()), Month(Today())+1,1),-1,TimeUnit.Days)),2))"
+      - btnExportCsv_OnSelect: "Download( JSON(chartTenant_Items, JSONFormat.IndentFour), \"credits-export.json\", \"application/json\")"
+
+  - Name: scrCompliance
+    Controls:
+      - galViolations_Items: "SortByColumns(Filter(gov_ComplianceViolation, ddSeverity.Selected.Value="" || gov_ruleid.gov_severity = ddSeverity.Selected.Value, ddViolationStatus.Selected.Value="" || gov_status=ddViolationStatus.Selected.Value), \"gov_violationdate\", SortOrder.Descending)"
+      - btnBulkAcknowledge_OnSelect: "ForAll(Filter(galViolations.AllItems, chkSelect.Value), Patch(gov_ComplianceViolation, ThisRecord, {gov_status:'Acknowledged'}))"
+      - secRules_Visible: "varIsAdmin"
+
+  - Name: scrAlerts
+    Controls:
+      - galAlerts_Items: "Filter(gov_AlertLog, (ddAlertType.Selected.Value="" || gov_alerttype=ddAlertType.Selected.Value) && (ddRead.Selected.Value="All" || gov_isread = If(ddRead.Selected.Value="Read", true, false)))"
+      - btnMarkRead_OnSelect: "Patch(gov_AlertLog, galAlerts.Selected, {gov_isread: true})"
+
+  - Name: scrSettings
+    Visible: "varIsAdmin"
+    Controls:
+      - btnTriggerInventory_OnSelect: "'GOV - Daily Agent Inventory Sync'.Run()"
+      - btnTriggerCredits_OnSelect: "'GOV - Daily Credit Consumption Sync'.Run()"
+      - txtWebhook_Default: "EnvironmentVariableValue('gov_TeamsWebhookURL')"
+      - txtAdminEmail_Default: "EnvironmentVariableValue('gov_AdminEmailGroup')"

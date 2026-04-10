@@ -1,0 +1,50 @@
+{
+  "name": "GOV - Daily Agent Inventory Sync",
+  "type": "Scheduled",
+  "recurrence": {"frequency": "Day", "interval": 1, "startTimeUtc": "02:00"},
+  "connections": ["shared_powerplatformforadmins", "shared_commondataserviceforapps"],
+  "workflowDefinition": {
+    "triggers": {"Recurrence": {"type": "Recurrence"}},
+    "actions": {
+      "List_Environments_as_Admin": {"type": "OpenApiConnection", "operationId": "GetEnvironments"},
+      "Apply_to_each_Environment": {
+        "foreach": "@body('List_Environments_as_Admin')?['value']",
+        "actions": {
+          "List_Bots": {"operationId": "ListRows", "parameters": {"table": "bot", "$filter": "statecode eq 0"}},
+          "Apply_to_each_Bot": {
+            "foreach": "@body('List_Bots')?['value']",
+            "actions": {
+              "Parse_Configuration": {
+                "type": "Compose",
+                "inputs": {
+                  "config": "@json(coalesce(items('Apply_to_each_Bot')?['configuration'],'{}'))",
+                  "useModelKnowledge": "@coalesce(json(coalesce(items('Apply_to_each_Bot')?['configuration'],'{}'))?['useModelKnowledge'],false)",
+                  "isSemanticSearchEnabled": "@coalesce(json(coalesce(items('Apply_to_each_Bot')?['configuration'],'{}'))?['isSemanticSearchEnabled'],false)",
+                  "authenticationmode": "@coalesce(json(coalesce(items('Apply_to_each_Bot')?['configuration'],'{}'))?['authenticationmode'],'None')"
+                }
+              },
+              "List_BotComponents": {"operationId": "ListRows", "parameters": {"table": "botcomponent", "$filter": "_botid_value eq @{items('Apply_to_each_Bot')?['botid']}"}},
+              "List_Processes": {"operationId": "ListRows", "parameters": {"table": "process", "$filter": "contains(clientdata,'@{items('Apply_to_each_Bot')?['botid']}')"}},
+              "Compute_Features": {
+                "type": "Compose",
+                "inputs": {
+                  "isAutonomous": "@greater(length(filter(body('List_BotComponents')?['value'], item()?['componenttypename'] == 17)),0)",
+                  "usesKnowledgeSources": "@greater(length(filter(body('List_BotComponents')?['value'], contains(item()?['componenttypename@OData.Community.Display.V1.FormattedValue'],'KnowledgeSource'))),0)",
+                  "usesHttp": "@greater(length(filter(body('List_BotComponents')?['value'], contains(string(item()?['data']),'HttpRequestAction'))),0)",
+                  "usesActions": "@greater(length(filter(body('List_BotComponents')?['value'], contains(string(item()?['data']),'TaskDialog'))),0)",
+                  "usesMakerAuth": "@greater(length(filter(body('List_BotComponents')?['value'], contains(string(item()?['data']),'\"mode\":\"maker\"'))),0)",
+                  "topicCount": "@length(filter(body('List_BotComponents')?['value'], contains(string(item()?['componenttypename@OData.Community.Display.V1.FormattedValue']),'Topic')))"
+                }
+              },
+              "Upsert_AgentInventory": {"operationId": "UpsertRow", "parameters": {"table": "gov_agentinventory", "alternateKey": "gov_agentid,gov_environmentid"}}
+            }
+          },
+          "Update_EnvironmentCapacity": {"operationId": "UpsertRow", "parameters": {"table": "gov_environmentcapacity", "alternateKey": "gov_environmentid"}}
+        }
+      },
+      "Mark_Missing_Agents_Disabled": {"type": "Scope", "description": "Compare prior sync and set gov_agentstatus=Disabled when absent."},
+      "Run_Compliance_Evaluator": {"type": "Workflow", "childFlow": "GOV - Compliance Evaluator"},
+      "Update_TenantSummary": {"type": "DataverseAggregate", "target": "gov_tenantsummary"}
+    }
+  }
+}

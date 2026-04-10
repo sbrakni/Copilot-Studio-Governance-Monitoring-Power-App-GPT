@@ -1,0 +1,18 @@
+{
+  "environmentVariables": [
+    {"schemaName":"gov_TeamsWebhookURL","type":"String","defaultValue":"","required":false},
+    {"schemaName":"gov_AdminEmailGroup","type":"String","defaultValue":"copilot-gov-admins@contoso.com","required":true},
+    {"schemaName":"gov_SharePointSiteURL","type":"String","defaultValue":"https://contoso.sharepoint.com/sites/CopilotGovernance","required":true},
+    {"schemaName":"gov_CreditReportsFolderPath","type":"String","defaultValue":"/CopilotGovernance/CreditReports","required":true},
+    {"schemaName":"gov_CapacityWarningThreshold","type":"Number","defaultValue":"80","required":true},
+    {"schemaName":"gov_HighConsumptionThreshold","type":"Number","defaultValue":"1000","required":true},
+    {"schemaName":"gov_ComplianceScoreTarget","type":"Number","defaultValue":"90","required":true}
+  ],
+  "connectionReferences": [
+    {"logicalName":"gov_sharedcommondataserviceforapps","api":"shared_commondataserviceforapps","displayName":"Dataverse"},
+    {"logicalName":"gov_sharedpowerplatformforadmins","api":"shared_powerplatformforadmins","displayName":"Power Platform for Admins"},
+    {"logicalName":"gov_sharedoffice365","api":"shared_office365","displayName":"Office 365 Outlook"},
+    {"logicalName":"gov_sharedteams","api":"shared_teams","displayName":"Microsoft Teams"},
+    {"logicalName":"gov_sharedsharepointonline","api":"shared_sharepointonline","displayName":"SharePoint"}
+  ]
+}

@@ -1,0 +1,152 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "solution": "CopilotStudioGovernance",
+  "publisherPrefix": "gov",
+  "tables": [
+    {
+      "logicalName": "gov_agentinventory",
+      "schemaName": "gov_AgentInventory",
+      "displayName": "Agent Inventory",
+      "description": "Comprehensive inventory of Copilot Studio agents",
+      "ownership": "UserOwned",
+      "alternateKeys": ["gov_agentid", "gov_environmentid"],
+      "columns": [
+        {"displayName":"Agent Name","schemaName":"gov_name","type":"String","maxLength":200,"required":true},
+        {"displayName":"Agent ID","schemaName":"gov_agentid","type":"String","maxLength":100,"required":true},
+        {"displayName":"Environment ID","schemaName":"gov_environmentid","type":"String","maxLength":100,"required":true},
+        {"displayName":"Environment Name","schemaName":"gov_environmentname","type":"String","maxLength":200},
+        {"displayName":"Environment Type","schemaName":"gov_environmenttype","type":"Choice","options":["Default","Sandbox","Developer","Production","Teams"]},
+        {"displayName":"Description","schemaName":"gov_description","type":"Memo"},
+        {"displayName":"Instructions","schemaName":"gov_instructions","type":"Memo"},
+        {"displayName":"Orchestration Type","schemaName":"gov_orchestrationtype","type":"Choice","options":["Generative","Classic"]},
+        {"displayName":"Is Autonomous","schemaName":"gov_isautonomous","type":"Boolean"},
+        {"displayName":"Uses AI Knowledge","schemaName":"gov_usesaiknowledge","type":"Boolean"},
+        {"displayName":"Uses Knowledge Sources","schemaName":"gov_usesknowledgesources","type":"Boolean"},
+        {"displayName":"Uses Tools/Actions","schemaName":"gov_usesactions","type":"Boolean"},
+        {"displayName":"Uses HTTP Requests","schemaName":"gov_useshttprequests","type":"Boolean"},
+        {"displayName":"Uses Connector Maker Auth","schemaName":"gov_usesmakerauth","type":"Boolean"},
+        {"displayName":"Uses Cloud Flow Maker Auth","schemaName":"gov_usescloudflowmakerauth","type":"Boolean"},
+        {"displayName":"End-User Auth Type","schemaName":"gov_enduserauthtype","type":"Choice","options":["None","Entra ID","Manual"]},
+        {"displayName":"Web Channel Enabled","schemaName":"gov_webchannelenabled","type":"Boolean"},
+        {"displayName":"Uses Enhanced Search","schemaName":"gov_usesenhancedsearch","type":"Boolean"},
+        {"displayName":"Knowledge Sources Detail","schemaName":"gov_knowledgesourcesdetail","type":"Memo"},
+        {"displayName":"Connector List","schemaName":"gov_connectorlist","type":"Memo"},
+        {"displayName":"Channel List","schemaName":"gov_channellist","type":"Memo"},
+        {"displayName":"Topic Count","schemaName":"gov_topiccount","type":"Integer"},
+        {"displayName":"Agent Status","schemaName":"gov_agentstatus","type":"Choice","options":["Published","Draft","Disabled"]},
+        {"displayName":"Created By (Agent)","schemaName":"gov_agentcreatedby","type":"String","maxLength":200},
+        {"displayName":"Modified By (Agent)","schemaName":"gov_agentmodifiedby","type":"String","maxLength":200},
+        {"displayName":"Agent Created Date","schemaName":"gov_agentcreateddate","type":"DateTime"},
+        {"displayName":"Agent Modified Date","schemaName":"gov_agentmodifieddate","type":"DateTime"},
+        {"displayName":"Last Synced","schemaName":"gov_lastsynced","type":"DateTime"},
+        {"displayName":"Compliance Status","schemaName":"gov_compliancestatus","type":"Choice","options":["Compliant","Warning","Non-Compliant"]},
+        {"displayName":"Compliance Notes","schemaName":"gov_compliancenotes","type":"Memo"},
+        {"displayName":"Solution Name","schemaName":"gov_solutionname","type":"String","maxLength":200},
+        {"displayName":"Owner Environment Admin","schemaName":"gov_owneradmin","type":"Lookup","target":"systemuser"}
+      ]
+    },
+    {
+      "logicalName": "gov_creditconsumption",
+      "schemaName": "gov_CreditConsumption",
+      "displayName": "Credit Consumption",
+      "ownership": "UserOwned",
+      "columns": [
+        {"displayName":"Agent","schemaName":"gov_agentid","type":"Lookup","target":"gov_agentinventory","required":true},
+        {"displayName":"Environment ID","schemaName":"gov_environmentid","type":"String","maxLength":100},
+        {"displayName":"Date","schemaName":"gov_date","type":"DateOnly","required":true},
+        {"displayName":"Billed Credits","schemaName":"gov_billedcredits","type":"Decimal","precision":2},
+        {"displayName":"Non-Billable Credits","schemaName":"gov_nonbillablecredits","type":"Decimal","precision":2},
+        {"displayName":"Feature Breakdown","schemaName":"gov_featurebreakdown","type":"Memo"},
+        {"displayName":"Product","schemaName":"gov_product","type":"String","maxLength":200},
+        {"displayName":"Is Overage","schemaName":"gov_isoverage","type":"Boolean"}
+      ]
+    },
+    {
+      "logicalName":"gov_environmentcapacity",
+      "schemaName":"gov_EnvironmentCapacity",
+      "displayName":"Environment Capacity",
+      "alternateKeys":["gov_environmentid"],
+      "columns":[
+        {"displayName":"Environment ID","schemaName":"gov_environmentid","type":"String","maxLength":100,"required":true},
+        {"displayName":"Environment Name","schemaName":"gov_environmentname","type":"String","maxLength":200},
+        {"displayName":"Allocated Credits","schemaName":"gov_allocatedcredits","type":"Integer"},
+        {"displayName":"Consumed Credits MTD","schemaName":"gov_consumedcreditsmtd","type":"Decimal","precision":2},
+        {"displayName":"Pay-As-You-Go Enabled","schemaName":"gov_paygenabled","type":"Boolean"},
+        {"displayName":"PAYG Credits MTD","schemaName":"gov_paygcreditsmtd","type":"Decimal","precision":2},
+        {"displayName":"Capacity Status","schemaName":"gov_capacitystatus","type":"Choice","options":["Within Capacity","Near Limit (>80%)","Overage"]},
+        {"displayName":"Agent Count","schemaName":"gov_agentcount","type":"Integer"},
+        {"displayName":"Published Agent Count","schemaName":"gov_publishedagentcount","type":"Integer"},
+        {"displayName":"Last Synced","schemaName":"gov_lastsynced","type":"DateTime"},
+        {"displayName":"Is Managed Environment","schemaName":"gov_ismanaged","type":"Boolean"},
+        {"displayName":"DLP Policies Applied","schemaName":"gov_dlppolicies","type":"Memo"}
+      ]
+    },
+    {
+      "logicalName":"gov_compliancerule",
+      "schemaName":"gov_ComplianceRule",
+      "displayName":"Compliance Rule",
+      "columns":[
+        {"displayName":"Rule Name","schemaName":"gov_rulename","type":"String","maxLength":200,"required":true},
+        {"displayName":"Rule Description","schemaName":"gov_ruledescription","type":"Memo"},
+        {"displayName":"Rule Type","schemaName":"gov_ruletype","type":"Choice","options":["Authentication","DataLoss","KnowledgeSource","Channel","Connector"]},
+        {"displayName":"Severity","schemaName":"gov_severity","type":"Choice","options":["Critical","Warning","Info"]},
+        {"displayName":"Is Active","schemaName":"gov_isactive","type":"Boolean","default":true},
+        {"displayName":"Evaluation Logic","schemaName":"gov_evaluationlogic","type":"Memo"},
+        {"displayName":"Auto-Remediation","schemaName":"gov_autoremediation","type":"Boolean"}
+      ]
+    },
+    {
+      "logicalName":"gov_complianceviolation",
+      "schemaName":"gov_ComplianceViolation",
+      "displayName":"Compliance Violation",
+      "columns":[
+        {"displayName":"Agent","schemaName":"gov_agentid","type":"Lookup","target":"gov_agentinventory"},
+        {"displayName":"Rule","schemaName":"gov_ruleid","type":"Lookup","target":"gov_compliancerule"},
+        {"displayName":"Violation Date","schemaName":"gov_violationdate","type":"DateTime"},
+        {"displayName":"Status","schemaName":"gov_status","type":"Choice","options":["Open","Acknowledged","Resolved","Suppressed"]},
+        {"displayName":"Details","schemaName":"gov_details","type":"Memo"},
+        {"displayName":"Resolved By","schemaName":"gov_resolvedby","type":"Lookup","target":"systemuser"},
+        {"displayName":"Resolved Date","schemaName":"gov_resolveddate","type":"DateTime"}
+      ]
+    },
+    {
+      "logicalName":"gov_alertlog",
+      "schemaName":"gov_AlertLog",
+      "displayName":"Alert Log",
+      "columns":[
+        {"displayName":"Alert Type","schemaName":"gov_alerttype","type":"Choice","options":["Overage","ComplianceViolation","NewAgent","UnauthorizedPublish","HighConsumption","DataSyncFailure"]},
+        {"displayName":"Severity","schemaName":"gov_severity","type":"Choice","options":["Critical","High","Medium","Low"]},
+        {"displayName":"Title","schemaName":"gov_title","type":"String","maxLength":300},
+        {"displayName":"Message","schemaName":"gov_message","type":"Memo"},
+        {"displayName":"Related Agent","schemaName":"gov_agentid","type":"Lookup","target":"gov_agentinventory"},
+        {"displayName":"Related Environment","schemaName":"gov_environmentid","type":"String","maxLength":100},
+        {"displayName":"Is Read","schemaName":"gov_isread","type":"Boolean"}
+      ]
+    },
+    {
+      "logicalName":"gov_tenantsummary",
+      "schemaName":"gov_TenantSummary",
+      "displayName":"Tenant Summary",
+      "alternateKeys":["gov_date"],
+      "columns":[
+        {"displayName":"Date","schemaName":"gov_date","type":"DateOnly","required":true},
+        {"displayName":"Total Agents","schemaName":"gov_totalagents","type":"Integer"},
+        {"displayName":"Published Agents","schemaName":"gov_publishedagents","type":"Integer"},
+        {"displayName":"Autonomous Agents","schemaName":"gov_autonomousagents","type":"Integer"},
+        {"displayName":"Gen AI Agents","schemaName":"gov_genaiagents","type":"Integer"},
+        {"displayName":"Total Environments","schemaName":"gov_totalenvironments","type":"Integer"},
+        {"displayName":"Total Billed Credits","schemaName":"gov_totalbilledcredits","type":"Decimal","precision":2},
+        {"displayName":"Total PAYG Credits","schemaName":"gov_totalpaygcredits","type":"Decimal","precision":2},
+        {"displayName":"Prepaid Capacity Total","schemaName":"gov_prepaidtotal","type":"Integer"},
+        {"displayName":"Prepaid Consumed","schemaName":"gov_prepaidconsumed","type":"Decimal","precision":2},
+        {"displayName":"Compliance Score","schemaName":"gov_compliancescore","type":"Decimal","precision":2},
+        {"displayName":"Active Violations","schemaName":"gov_activeviolations","type":"Integer"}
+      ]
+    }
+  ],
+  "relationships": [
+    {"name":"gov_agentinventory_gov_creditconsumption","from":"gov_agentinventory","to":"gov_creditconsumption","type":"OneToMany","fromColumn":"gov_agentinventoryid","toColumn":"gov_agentid"},
+    {"name":"gov_agentinventory_gov_complianceviolation","from":"gov_agentinventory","to":"gov_complianceviolation","type":"OneToMany","fromColumn":"gov_agentinventoryid","toColumn":"gov_agentid"},
+    {"name":"gov_compliancerule_gov_complianceviolation","from":"gov_compliancerule","to":"gov_complianceviolation","type":"OneToMany","fromColumn":"gov_complianceruleid","toColumn":"gov_ruleid"}
+  ]
+}

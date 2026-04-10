@@ -1,0 +1,14 @@
+{
+  "name": "GOV - Manual Credit Report Import",
+  "type": "Automated",
+  "trigger": "SharePoint.WhenAFileIsCreated",
+  "triggerConfig": {"folderPath":"/CopilotGovernance/CreditReports"},
+  "workflowDefinition": {
+    "actions": {
+      "Get_File_Content": "SharePoint Get file content",
+      "Parse_CSV": "Use Data Operation Select/Split over lines",
+      "Upsert_Credit_Rows": "For each row map EnvironmentId,AgentName,AgentId,Date,BilledCredits,NonBillableCredits,Product,Feature",
+      "Move_File": "Move to /CopilotGovernance/CreditReports/Processed"
+    }
+  }
+}
